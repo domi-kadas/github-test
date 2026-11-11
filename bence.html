@@ -137,10 +137,14 @@ button {
   min-height: 3rem;
 }
 button.solid { background: var(--ink); color: var(--on-solid); }
-button:hover:not(:disabled) { border-color: var(--alert); }
-button.solid:hover:not(:disabled) { background: var(--alert); }
+@media (hover: hover) {
+  button:hover:not(:disabled) { border-color: var(--alert); }
+  button.solid:hover:not(:disabled) { background: var(--alert); }
+}
 button:focus-visible { outline: 3px solid var(--alert); outline-offset: 2px; }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
+.options { display: flex; flex-direction: column; gap: 0.6rem; }
+.options button { text-align: left; line-height: 1.3; }
 .hint { font: 400 0.82rem/1.5 var(--mono); color: var(--muted); min-height: 1.3rem; }
 h1.ok { color: var(--ok); }
 .balek { width: 9.5rem; max-width: 100%; height: auto; align-self: center; }
@@ -148,7 +152,7 @@ h1.ok { color: var(--ok); }
 .balek .eye { fill: var(--ink); }
 .balek .shine { fill: var(--sheet); }
 .balek .ln { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
-.balek .tear { fill: var(--alert); }
+.balek .ear { fill: var(--ink); }
 .toast { font: 500 clamp(1.15rem, 4.6vw, 1.35rem)/1.35 var(--display); }
 @media (prefers-reduced-motion: no-preference) {
   .step:not([hidden]) { animation: in 0.25s ease-out; }
@@ -211,15 +215,17 @@ h1.ok { color: var(--ok); }
     <p class="eyebrow">Megerősítés · 1 / 2</p>
     <h2 tabindex="-1">Biztos nem?</h2>
     <p class="lead">A rendszer szerint ez elhamarkodott válasz volt. A balek közben nagyon szépen néz:</p>
-    <svg class="balek" viewBox="0 0 200 160" role="img" aria-label="Nagy szemű, könyörgő balek">
-      <circle class="skin" cx="42" cy="48" r="20"/><circle class="skin" cx="158" cy="48" r="20"/>
-      <ellipse class="skin" cx="100" cy="92" rx="76" ry="62"/>
-      <path class="ln" d="M48 52 Q62 40 80 46"/><path class="ln" d="M152 52 Q138 40 120 46"/>
-      <circle class="eye" cx="66" cy="88" r="27"/><circle class="eye" cx="134" cy="88" r="27"/>
-      <circle class="shine" cx="56" cy="77" r="10"/><circle class="shine" cx="124" cy="77" r="10"/>
-      <circle class="shine" cx="76" cy="99" r="5"/><circle class="shine" cx="144" cy="99" r="5"/>
-      <path class="ln" d="M90 130 Q100 123 110 130"/>
-      <path class="tear" d="M163 112 q7 11 0 16 q-7 -5 0 -16z"/>
+    <svg class="balek" viewBox="0 0 200 170" role="img" aria-label="Nagy szemű, könyörgő balek">
+      <path class="ear" d="M44 46 C14 44 4 84 16 118 C24 136 44 128 48 104 Z"/>
+      <path class="ear" d="M156 46 C186 44 196 84 184 118 C176 136 156 128 152 104 Z"/>
+      <path class="skin" d="M100 22 C146 22 170 54 170 94 C170 134 140 156 100 156 C60 156 30 134 30 94 C30 54 54 22 100 22 Z"/>
+      <path class="ln" d="M52 62 Q64 50 80 56"/><path class="ln" d="M148 62 Q136 50 120 56"/>
+      <circle class="eye" cx="70" cy="92" r="24"/><circle class="eye" cx="130" cy="92" r="24"/>
+      <circle class="shine" cx="62" cy="83" r="9"/><circle class="shine" cx="122" cy="83" r="9"/>
+      <circle class="shine" cx="79" cy="102" r="4.5"/><circle class="shine" cx="139" cy="102" r="4.5"/>
+      <path class="shine" d="M52 104 Q70 116 88 104 Q70 112 52 104Z"/><path class="shine" d="M112 104 Q130 116 148 104 Q130 112 112 104Z"/>
+      <ellipse class="eye" cx="100" cy="124" rx="8" ry="5.5"/>
+      <path class="ln" d="M100 130 V136 M90 141 Q95 135 100 136 Q105 135 110 141"/>
     </svg>
     <div class="actions">
       <button class="solid" id="sure-yes" type="button">Na jó, igen</button>
@@ -238,6 +244,24 @@ h1.ok { color: var(--ok); }
     </div>
   </section>
 
+  <section class="step" id="s-gate" hidden>
+    <p class="eyebrow">Jogosultság-ellenőrzés</p>
+    <h2 tabindex="-1">A „nem” gomb szakmai vizsgához kötött</h2>
+    <p class="lead"><span data-f="gate"></span> Öt kérdés jön. Egyetlen hiba, és kezded elölről.</p>
+    <div class="actions">
+      <button class="solid" id="gate-yes" type="button">Inkább igen</button>
+      <button id="gate-go" type="button">Jöhet a kvíz</button>
+    </div>
+  </section>
+
+  <section class="step" id="s-quiz" hidden>
+    <p class="eyebrow" id="quiz-count"></p>
+    <h2 tabindex="-1" id="quiz-q"></h2>
+    <div class="options" id="quiz-opts"></div>
+    <p class="hint" id="quiz-hint" aria-live="polite"></p>
+    <div class="actions"><button class="solid" id="quiz-yes" type="button">Feladom: igen</button></div>
+  </section>
+
   <section class="step" id="s-done" hidden>
     <p class="eyebrow">Hibaelhárítás · eredmény</p>
     <h1 id="done-code"></h1>
@@ -251,12 +275,12 @@ h1.ok { color: var(--ok); }
 
 <script>
 (function () {
-  var CFG = {"slug":"c-mint-bence","first":"Bence","full":"Ádám Bence","alias":"C, mint Bence","motto":"Hidd el, normális ember szorult ebbe a testbe","role":"keresztanyám","topic":"felkeres-73abf18eb61fdce9d2"};
+  var CFG = {"slug":"c-mint-bence","first":"Bence","full":"Ádám Bence","alias":"C, mint Bence","motto":"Hidd el, normális ember szorult ebbe a testbe","role":"keresztanyám","gate":"Logisztikai mérnökként ez biztos nem okoz gondot.","quiz":[["Mit jelent a FIFO elv?","Ami elsőnek jött be, az megy ki elsőnek","Ami utolsónak jött be, az megy ki elsőnek","Ami a legdrágább, az megy ki elsőnek"],["Mekkora az EUR-raklap alapmérete?","800 × 1200 mm","1000 × 1200 mm","600 × 800 mm"],["Mit jelent a JIT?","Just in Time","Job in Transit","Joint Inventory Tracking"],["Melyik Incoterms-paritásnál viseli a legtöbb kötelezettséget az eladó?","DDP","EXW","FOB"],["Mi jellemzi az ABC-elemzés „A” kategóriáját?","Kevés tétel, nagy értékarány","Sok tétel, kis értékarány","Az ábécérendben első cikkek"],["Mi a cross-docking?","Az áru átrakása tárolás nélkül","Kétszintes raktári polcrendszer","Keresztben beálló kamion"],["Mit jelent a 3PL?","Külső szolgáltatóra bízott logisztika","Három raklaphelyes rakomány","Háromnapos szállítási határidő"],["Hány láb hosszú egy 1 TEU-s konténer?","20","40","10"]],"topic":"felkeres-73abf18eb61fdce9d2"};
   var $ = function (id) { return document.getElementById(id); };
   var reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var fields = {
-    slug: CFG.slug, full: CFG.full, alias: CFG.alias, motto: CFG.motto,
+    slug: CFG.slug, full: CFG.full, alias: CFG.alias, motto: CFG.motto, gate: CFG.gate,
     role: CFG.role
   };
   document.querySelectorAll("[data-f]").forEach(function (el) {
@@ -389,7 +413,46 @@ h1.ok { color: var(--ok); }
   $("ask-yes").onclick = function () { finish("IGEN", "elsőre"); };
   $("sure-yes").onclick = function () { finish("IGEN", "a „biztos nem?” után"); };
   $("tuti-yes").onclick = function () { finish("IGEN", "gondolkodási idő után"); };
-  $("tuti-no").onclick = function () { finish("NEM", "végigvitte"); };
+  $("tuti-no").onclick = function () { show("s-gate"); };
+
+  // Quiz: five questions in a row, one mistake restarts it with a fresh draw.
+  var QUIZ_LEN = 5, round = 0, qi = 0, picked = [];
+  function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function startQuiz(msg) {
+    round++; qi = 0;
+    picked = shuffle(CFG.quiz).slice(0, QUIZ_LEN);
+    showQuestion(msg || "");
+  }
+  function showQuestion(msg) {
+    var q = picked[qi];
+    $("quiz-count").textContent = "Kérdés " + (qi + 1) + " / " + QUIZ_LEN + " · " + round + ". próbálkozás";
+    $("quiz-q").textContent = q[0];
+    $("quiz-hint").textContent = msg;
+    var box = $("quiz-opts");
+    box.textContent = "";
+    shuffle(q.slice(1)).forEach(function (text) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = text;
+      b.onclick = function () {
+        if (text !== q[1]) { startQuiz("Hibás válasz. A kvíz elölről indul, új kérdésekkel."); return; }
+        qi++;
+        if (qi >= QUIZ_LEN) finish("NEM", "kvíz teljesítve, " + round + ". próbálkozásra");
+        else showQuestion("Helyes. Sajnos.");
+      };
+      box.appendChild(b);
+    });
+    show("s-quiz");
+  }
+  $("gate-go").onclick = function () { startQuiz(); };
+  $("gate-yes").onclick = function () { finish("IGEN", "a kvíz elől menekülve"); };
+  $("quiz-yes").onclick = function () { finish("IGEN", "kvíz közben feladta, " + round + ". próbálkozás"); };
 })();
 </script>
 </body>
