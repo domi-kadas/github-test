@@ -97,6 +97,7 @@ h2 {
   text-wrap: balance;
 }
 h2:focus { outline: none; }
+h2.stammer { font: 400 clamp(1.7rem, 8vw, 2.3rem)/1.2 var(--mono); letter-spacing: 0; margin-block: 1.5rem; }
 .lead { color: var(--muted); }
 .log {
   font: 400 0.82rem/1.7 var(--mono);
@@ -162,6 +163,10 @@ h1.ok { color: var(--ok); }
 @media (prefers-reduced-motion: no-preference) {
   .step:not([hidden]) { animation: in 0.25s ease-out; }
 }
+@media (prefers-reduced-motion: no-preference) {
+  .step:not([hidden]) h2.stammer { animation: shiver 0.12s linear 0.25s 8 alternate; }
+}
+@keyframes shiver { from { transform: translateX(-2px); } to { transform: translateX(2px); } }
 @keyframes in { from { transform: translateY(6px); opacity: 0.4; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .arena button { transition: none; } }
 </style>
@@ -252,7 +257,7 @@ h1.ok { color: var(--ok); }
 
   <section class="step" id="s-really" hidden>
     <p class="eyebrow">Váratlan válasz</p>
-    <h2 tabindex="-1">T-t-te-tényleg?</h2>
+    <h2 tabindex="-1" class="stammer">T-t-te-tényleg?</h2>
     <div class="actions">
       <button class="solid" id="really-yes" type="button">Igen</button>
       <button id="really-no" type="button">Nem</button>
@@ -464,8 +469,8 @@ h1.ok { color: var(--ok); }
       ? "A balek mostantól nem gazdátlan."
       : "A balek továbbra is gazdátlan. De nem adja fel.";
     $("done-toast").textContent = yes
-      ? "Balekkeresztelő előtt, amikor találkozunk, erre majd iszunk!"
-      : "Balekkeresztelő előtt, amikor találkozunk, erre is iszunk egyet.";
+      ? "A balekkeresztelő előtt, amikor találkozunk, erre majd iszunk!"
+      : "A balekkeresztelő előtt, amikor találkozunk, erre is iszunk egyet.";
     $("done-log").textContent = "válasz: " + answer;
     $("done-log").className = yes ? "good" : "bad";
     if (yes) {
