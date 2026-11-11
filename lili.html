@@ -257,7 +257,7 @@ h1.ok { color: var(--ok); }
 
   <section class="step" id="s-really" hidden>
     <p class="eyebrow">Váratlan válasz</p>
-    <h2 tabindex="-1" class="stammer">T-t-te-tényleg?</h2>
+    <h2 tabindex="-1" class="stammer">t-t-té-tényleg?</h2>
     <div class="actions">
       <button class="solid" id="really-yes" type="button">Igen</button>
       <button id="really-no" type="button">Nem</button>
@@ -486,9 +486,13 @@ h1.ok { color: var(--ok); }
     });
   }
   // An early "Igen" gets a disbelieving double-check; "Nem" there continues the normal "Nem" path.
-  var reallyFrom = "";
-  $("ask-yes").onclick = function () { reallyFrom = "ask"; show("s-really"); };
-  $("sure-yes").onclick = function () { reallyFrom = "sure"; show("s-really"); };
+  // The double-check appears only once; a later "Igen" is accepted straight away.
+  var reallyFrom = "", reallyShown = false;
+  $("ask-yes").onclick = function () { reallyFrom = "ask"; reallyShown = true; show("s-really"); };
+  $("sure-yes").onclick = function () {
+    if (reallyShown) { finish("IGEN", "a „biztos nem?” után, másodszorra"); return; }
+    reallyFrom = "sure"; reallyShown = true; show("s-really");
+  };
   $("really-yes").onclick = function () {
     finish("IGEN", reallyFrom === "ask" ? "elsőre" : "a „biztos nem?” után");
   };
@@ -498,7 +502,7 @@ h1.ok { color: var(--ok); }
 
   $("restart").onclick = function () {
     clearTimeout(tutiTimer);
-    answered = false; dodges = 0; lastDodge = 0; idNo = 0; winMoved = 0; round = 0;
+    answered = false; dodges = 0; lastDodge = 0; idNo = 0; winMoved = 0; round = 0; reallyShown = false;
     var c = document.getElementById("confetti");
     if (c) c.remove();
     ["id-hint", "ask-hint", "win-hint", "tuti-hint", "done-hint"].forEach(function (id) { $(id).textContent = ""; });
