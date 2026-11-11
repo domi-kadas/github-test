@@ -250,9 +250,19 @@ h1.ok { color: var(--ok); }
     </div>
   </section>
 
+  <section class="step" id="s-really" hidden>
+    <p class="eyebrow">Váratlan válasz</p>
+    <h2 tabindex="-1">T-t-te-tényleg?</h2>
+    <div class="actions">
+      <button class="solid" id="really-yes" type="button">Igen</button>
+      <button id="really-no" type="button">Nem</button>
+    </div>
+  </section>
+
   <section class="step" id="s-gate" hidden>
     <p class="eyebrow">Jogosultság-ellenőrzés</p>
-    <h2 tabindex="-1">Ha a nemet akarod nyomni, egy kvízt is ki kell töltened.</h2>
+    <h2 tabindex="-1">Ha tényleg a nemre szeretnél nyomni, akkor egy kvízt is meg kell csinálnod!</h2>
+    <p class="lead" data-f="gate"></p>
     <p class="lead">5 kérdés lesz, és hibánál újra kell kezdened!</p>
     <div class="actions">
       <button class="solid" id="gate-yes" type="button">Inkább igen</button>
@@ -262,7 +272,7 @@ h1.ok { color: var(--ok); }
 
   <section class="step" id="s-win" hidden>
     <p class="eyebrow">Kvíz teljesítve</p>
-    <h2 tabindex="-1">Nyertél…</h2>
+    <h2 tabindex="-1" id="win-title">Nyertél…</h2>
     <p class="hint" id="win-hint" aria-live="polite"></p>
     <div class="arena" id="win-arena"><button id="win-no" type="button">Nem</button></div>
   </section>
@@ -281,8 +291,9 @@ h1.ok { color: var(--ok); }
     <h2 tabindex="-1" id="done-title"></h2>
     <p class="lead" id="done-text"></p>
     <div class="log">POST /firmak/<span data-f="slug"></span>/balek<br><span id="done-log"></span></div>
-    <p class="toast">Balekkeresztelő előtt, amikor találkozunk, erre is iszunk egyet.</p>
+    <p class="toast" id="done-toast"></p>
     <p class="hint" id="done-hint"></p>
+    <div class="actions"><button id="restart" type="button">Újrakezdés az elejétől</button></div>
   </section>
 </main>
 
@@ -384,23 +395,28 @@ h1.ok { color: var(--ok); }
     show("s-sure");
   });
 
-  $("sure-no").onclick = function () {
+  var tutiTimer = 0;
+  function goTuti() {
     show("s-tuti");
-    var left = reduced ? 0 : 7;
+    clearTimeout(tutiTimer);
+    $("tuti-no").disabled = true;
+    var left = reduced ? 0 : 10;
     var slow = { 3: 1500, 2: 2000, 1: 2500 };
+    var say = { 6: "Most tényleg inkább megvárod?", 5: "Most tényleg inkább megvárod?", 4: "Most tényleg inkább megvárod?",
+      3: "Még meggondolhatod magad.", 2: "Légyszi?", 1: ">:(" };
     (function tick() {
       if (left > 0) {
-        var say = { 3: "Légyszi?", 2: "Még meggondolhatod magad.", 1: ">:(" };
-        $("tuti-hint").textContent = "Még " + left + " mp. " + (say[left] || "Most tényleg inkább megvárod?");
+        $("tuti-hint").textContent = "Még " + left + " mp." + (say[left] ? " " + say[left] : "");
         var wait = slow[left] || 1000;
         left--;
-        setTimeout(tick, wait);
+        tutiTimer = setTimeout(tick, wait);
       } else {
         $("tuti-hint").textContent = "Lejárt az idő. Most már rányomhatsz…";
         $("tuti-no").disabled = false;
       }
     })();
-  };
+  }
+  $("sure-no").onclick = goTuti;
 
   function confetti() {
     if (reduced) return;
@@ -447,6 +463,9 @@ h1.ok { color: var(--ok); }
     $("done-text").textContent = yes
       ? "A balek mostantól nem gazdátlan."
       : "A balek továbbra is gazdátlan. De nem adja fel.";
+    $("done-toast").textContent = yes
+      ? "Balekkeresztelő előtt, amikor találkozunk, erre majd iszunk!"
+      : "Balekkeresztelő előtt, amikor találkozunk, erre is iszunk egyet.";
     $("done-log").textContent = "válasz: " + answer;
     $("done-log").className = yes ? "good" : "bad";
     if (yes) {
@@ -461,8 +480,32 @@ h1.ok { color: var(--ok); }
         : "Küldj erről egy képernyőfotót a balekodnak, hogy biztosan megkapja.";
     });
   }
-  $("ask-yes").onclick = function () { finish("IGEN", "elsőre"); };
-  $("sure-yes").onclick = function () { finish("IGEN", "a „biztos nem?” után"); };
+  // An early "Igen" gets a disbelieving double-check; "Nem" there continues the normal "Nem" path.
+  var reallyFrom = "";
+  $("ask-yes").onclick = function () { reallyFrom = "ask"; show("s-really"); };
+  $("sure-yes").onclick = function () { reallyFrom = "sure"; show("s-really"); };
+  $("really-yes").onclick = function () {
+    finish("IGEN", reallyFrom === "ask" ? "elsőre" : "a „biztos nem?” után");
+  };
+  $("really-no").onclick = function () {
+    if (reallyFrom === "ask") show("s-sure"); else goTuti();
+  };
+
+  $("restart").onclick = function () {
+    clearTimeout(tutiTimer);
+    answered = false; dodges = 0; lastDodge = 0; idNo = 0; winMoved = 0; round = 0;
+    var c = document.getElementById("confetti");
+    if (c) c.remove();
+    ["id-hint", "ask-hint", "win-hint", "tuti-hint", "done-hint"].forEach(function (id) { $(id).textContent = ""; });
+    ["ask-no", "win-no"].forEach(function (id) { $(id).style.left = ""; $(id).style.bottom = ""; });
+    $("id-no").hidden = false;
+    $("id-no").textContent = "Nem én vagyok";
+    $("win-title").hidden = false;
+    $("scan-next").hidden = true;
+    $("status").textContent = "404 · hiba";
+    $("status").classList.remove("ok");
+    show("s-404");
+  };
   $("tuti-yes").onclick = function () { finish("IGEN", "gondolkodási idő után"); };
   $("tuti-no").onclick = function () { show("s-gate"); };
 
@@ -507,6 +550,7 @@ h1.ok { color: var(--ok); }
       var arena = $("win-arena"), no = $("win-no");
       no.style.left = Math.max(0, arena.clientWidth - no.offsetWidth) * 0.75 + "px";
       no.style.bottom = Math.max(0, arena.clientHeight - no.offsetHeight) * 0.8 + "px";
+      $("win-title").hidden = true;
       $("win-hint").textContent = "Na jó, bocsi, most már tényleg rányomhatsz.";
       winMoved = Date.now();
       return;
