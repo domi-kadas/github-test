@@ -19,6 +19,8 @@
   --alert: #c8102e;
   --ok: #1b7a4b;
   --on-solid: #ffffff;
+  /* the puppy keeps its own colours in both themes */
+  --fur: #f6e7cf; --iris: #7a3b12; --pup-line: #1c1410; --on-pup: #ffffff;
   --display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
   --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -148,11 +150,14 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .hint { font: 400 0.82rem/1.5 var(--mono); color: var(--muted); min-height: 1.3rem; }
 h1.ok { color: var(--ok); }
 .balek { width: 9.5rem; max-width: 100%; height: auto; align-self: center; }
-.balek .skin { fill: var(--bg); stroke: var(--ink); stroke-width: 3; }
-.balek .eye { fill: var(--ink); }
-.balek .shine { fill: var(--sheet); }
-.balek .ln { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
-.balek .ear { fill: var(--ink); }
+.balek .fur { fill: var(--fur); stroke: var(--pup-line); stroke-width: 3.5; }
+.balek .ear { fill: var(--iris); stroke: var(--pup-line); stroke-width: 3.5; stroke-linejoin: round; }
+.balek .white { fill: var(--on-pup); stroke: var(--pup-line); stroke-width: 4; }
+.balek .iris { fill: var(--iris); stroke: var(--pup-line); stroke-width: 3.5; }
+.balek .shine { fill: var(--on-pup); }
+.balek .nose { fill: var(--pup-line); }
+.balek .ln { fill: none; stroke: var(--pup-line); stroke-width: 3.5; stroke-linecap: round; }
+#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; }
 .toast { font: 500 clamp(1.15rem, 4.6vw, 1.35rem)/1.35 var(--display); }
 @media (prefers-reduced-motion: no-preference) {
   .step:not([hidden]) { animation: in 0.25s ease-out; }
@@ -199,7 +204,7 @@ h1.ok { color: var(--ok); }
   </section>
 
   <section class="step" id="s-ask" hidden>
-    <p class="eyebrow">1 találat · üzenet a balektól</p>
+    <p class="eyebrow">1 találat · üzenet Domitól</p>
     <blockquote>
       <strong data-f="full"></strong>, alias <strong data-f="alias"></strong>, avagy <strong data-f="motto"></strong>:
       leszel-e a <strong data-f="role"></strong>?
@@ -214,18 +219,19 @@ h1.ok { color: var(--ok); }
   <section class="step" id="s-sure" hidden>
     <p class="eyebrow">Megerősítés · 1 / 2</p>
     <h2 tabindex="-1">Biztos nem?</h2>
-    <p class="lead">A rendszer szerint ez elhamarkodott válasz volt. A balek közben nagyon szépen néz:</p>
-    <svg class="balek" viewBox="0 0 200 170" role="img" aria-label="Nagy szemű, könyörgő balek">
-      <path class="ear" d="M44 46 C14 44 4 84 16 118 C24 136 44 128 48 104 Z"/>
-      <path class="ear" d="M156 46 C186 44 196 84 184 118 C176 136 156 128 152 104 Z"/>
-      <path class="skin" d="M100 22 C146 22 170 54 170 94 C170 134 140 156 100 156 C60 156 30 134 30 94 C30 54 54 22 100 22 Z"/>
-      <path class="ln" d="M52 62 Q64 50 80 56"/><path class="ln" d="M148 62 Q136 50 120 56"/>
-      <circle class="eye" cx="70" cy="92" r="24"/><circle class="eye" cx="130" cy="92" r="24"/>
-      <circle class="shine" cx="62" cy="83" r="9"/><circle class="shine" cx="122" cy="83" r="9"/>
-      <circle class="shine" cx="79" cy="102" r="4.5"/><circle class="shine" cx="139" cy="102" r="4.5"/>
-      <path class="shine" d="M52 104 Q70 116 88 104 Q70 112 52 104Z"/><path class="shine" d="M112 104 Q130 116 148 104 Q130 112 112 104Z"/>
-      <ellipse class="eye" cx="100" cy="124" rx="8" ry="5.5"/>
-      <path class="ln" d="M100 130 V136 M90 141 Q95 135 100 136 Q105 135 110 141"/>
+    <p class="lead">A rendszer szerint ez elhamarkodott válasz volt.</p>
+    <p class="hint">*a balek közben nagyon szépen néz*</p>
+    <svg class="balek" viewBox="0 0 200 170" role="img" aria-label="Nagy szemű, könyörgő kiskutya">
+      <path class="ear" d="M46 44 C14 42 4 84 16 120 C24 138 46 130 50 104 Z"/>
+      <path class="ear" d="M154 44 C186 42 196 84 184 120 C176 138 154 130 150 104 Z"/>
+      <path class="fur" d="M100 20 C146 20 172 52 172 94 C172 136 140 158 100 158 C60 158 28 136 28 94 C28 52 54 20 100 20 Z"/>
+      <path class="ln" d="M50 54 Q58 44 70 47"/><path class="ln" d="M150 54 Q142 44 130 47"/>
+      <circle class="white" cx="68" cy="92" r="27"/><circle class="white" cx="132" cy="92" r="27"/>
+      <circle class="iris" cx="71" cy="95" r="20"/><circle class="iris" cx="129" cy="95" r="20"/>
+      <circle class="shine" cx="78" cy="86" r="7"/><circle class="shine" cx="122" cy="86" r="7"/>
+      <circle class="shine" cx="63" cy="103" r="4"/><circle class="shine" cx="137" cy="103" r="4"/>
+      <ellipse class="nose" cx="100" cy="126" rx="8" ry="5.5"/>
+      <path class="ln" d="M100 132 V137 M91 142 Q96 137 100 138 Q104 137 109 142"/>
     </svg>
     <div class="actions">
       <button class="solid" id="sure-yes" type="button">Na jó, igen</button>
@@ -246,12 +252,19 @@ h1.ok { color: var(--ok); }
 
   <section class="step" id="s-gate" hidden>
     <p class="eyebrow">Jogosultság-ellenőrzés</p>
-    <h2 tabindex="-1">A „nem” gomb szakmai vizsgához kötött</h2>
-    <p class="lead"><span data-f="gate"></span> Öt kérdés jön. Egyetlen hiba, és kezded elölről.</p>
+    <h2 tabindex="-1">Ha a nemet akarod nyomni, egy kvízt is ki kell töltened.</h2>
+    <p class="lead">5 kérdés lesz, és hibánál újra kell kezdened!</p>
     <div class="actions">
       <button class="solid" id="gate-yes" type="button">Inkább igen</button>
       <button id="gate-go" type="button">Jöhet a kvíz</button>
     </div>
+  </section>
+
+  <section class="step" id="s-win" hidden>
+    <p class="eyebrow">Kvíz teljesítve</p>
+    <h2 tabindex="-1">Nyertél…</h2>
+    <p class="hint" id="win-hint" aria-live="polite"></p>
+    <div class="arena" id="win-arena"><button id="win-no" type="button">Nem</button></div>
   </section>
 
   <section class="step" id="s-quiz" hidden>
@@ -312,7 +325,9 @@ h1.ok { color: var(--ok); }
       $("id-hint").textContent = "Hmm, tuti? Pedig nagyon úgy nézel ki. Nézd meg még egyszer.";
       $("id-no").textContent = "Tuti nem én vagyok";
     } else {
-      $("id-hint").textContent = "Akkor ez nem neked szól. Add oda a telefont az illetékes firmának.";
+      $("id-hint").textContent = "Oké, " + CFG.first + ", tudom, hogy te vagy az!";
+      $("id-no").hidden = true;
+      $("id-yes").focus();
     }
   };
   $("id-yes").onclick = function () {
@@ -375,16 +390,51 @@ h1.ok { color: var(--ok); }
     var slow = { 3: 1500, 2: 2000, 1: 2500 };
     (function tick() {
       if (left > 0) {
-        $("tuti-hint").textContent = "Gondolkodási idő: még " + left + " mp";
+        var say = { 3: "Légyszi?", 2: "Még meggondolhatod magad.", 1: ">:(" };
+        $("tuti-hint").textContent = "Még " + left + " mp. " + (say[left] || "Most tényleg inkább megvárod?");
         var wait = slow[left] || 1000;
         left--;
         setTimeout(tick, wait);
       } else {
-        $("tuti-hint").textContent = "Lejárt az idő. Ha nagyon muszáj, most már nyomhatod.";
+        $("tuti-hint").textContent = "Lejárt az idő. Most már rányomhatsz…";
         $("tuti-no").disabled = false;
       }
     })();
   };
+
+  function confetti() {
+    if (reduced) return;
+    var c = document.createElement("canvas");
+    c.id = "confetti";
+    document.body.appendChild(c);
+    var ctx = c.getContext("2d"), dpr = window.devicePixelRatio || 1;
+    var W = c.width = innerWidth * dpr, H = c.height = innerHeight * dpr;
+    var colors = ["#c8102e", "#f2b705", "#1b7a4b", "#2f6fde", "#e86a92", "#ffffff"];
+    var bits = [];
+    for (var i = 0; i < 160; i++) {
+      bits.push({
+        x: Math.random() * W, y: -Math.random() * H * 0.6,
+        vx: (Math.random() - 0.5) * 3 * dpr, vy: (2 + Math.random() * 4) * dpr,
+        w: (6 + Math.random() * 6) * dpr, h: (3 + Math.random() * 4) * dpr,
+        r: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.3,
+        c: colors[i % colors.length]
+      });
+    }
+    var t0 = Date.now();
+    (function frame() {
+      var t = Date.now() - t0;
+      ctx.clearRect(0, 0, W, H);
+      ctx.globalAlpha = t > 4000 ? Math.max(0, 1 - (t - 4000) / 1000) : 1;
+      bits.forEach(function (b) {
+        b.x += b.vx; b.y += b.vy; b.r += b.vr;
+        if (b.y > H + 20 && t < 3000) { b.y = -20; b.x = Math.random() * W; }
+        ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.r);
+        ctx.fillStyle = b.c; ctx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
+        ctx.restore();
+      });
+      if (t < 5000) requestAnimationFrame(frame); else c.remove();
+    })();
+  }
 
   var answered = false;
   function finish(answer, where) {
@@ -400,6 +450,7 @@ h1.ok { color: var(--ok); }
     $("done-log").textContent = "válasz: " + answer;
     $("done-log").className = yes ? "good" : "bad";
     if (yes) {
+      confetti();
       $("status").textContent = "200 · rendben";
       $("status").classList.add("ok");
     }
@@ -443,13 +494,26 @@ h1.ok { color: var(--ok); }
       b.onclick = function () {
         if (text !== q[1]) { startQuiz("Hibás válasz. A kvíz elölről indul, új kérdésekkel."); return; }
         qi++;
-        if (qi >= QUIZ_LEN) finish("NEM", "kvíz teljesítve, " + round + ". próbálkozásra");
+        if (qi >= QUIZ_LEN) show("s-win");
         else showQuestion("Helyes. Sajnos.");
       };
       box.appendChild(b);
     });
     show("s-quiz");
   }
+  var winMoved = 0;
+  $("win-no").onclick = function () {
+    if (!winMoved) {
+      var arena = $("win-arena"), no = $("win-no");
+      no.style.left = Math.max(0, arena.clientWidth - no.offsetWidth) * 0.75 + "px";
+      no.style.bottom = Math.max(0, arena.clientHeight - no.offsetHeight) * 0.8 + "px";
+      $("win-hint").textContent = "Na jó, bocsi, most már tényleg rányomhatsz.";
+      winMoved = Date.now();
+      return;
+    }
+    if (Date.now() - winMoved < 350) return;
+    finish("NEM", "kvíz teljesítve, " + round + ". próbálkozásra");
+  };
   $("gate-go").onclick = function () { startQuiz(); };
   $("gate-yes").onclick = function () { finish("IGEN", "a kvíz elől menekülve"); };
   $("quiz-yes").onclick = function () { finish("IGEN", "kvíz közben feladta, " + round + ". próbálkozás"); };
