@@ -142,24 +142,18 @@ button.solid:hover:not(:disabled) { background: var(--alert); }
 button:focus-visible { outline: 3px solid var(--alert); outline-offset: 2px; }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
 .hint { font: 400 0.82rem/1.5 var(--mono); color: var(--muted); min-height: 1.3rem; }
-.stamp {
-  align-self: flex-start;
-  font: 800 clamp(3rem, 16vw, 4.5rem)/1 var(--display);
-  letter-spacing: 0.04em;
-  color: var(--alert);
-  border: 0.3rem solid var(--alert);
-  border-radius: 6px;
-  padding: 0.35rem 1rem 0.45rem;
-  transform: rotate(-6deg);
-  margin: 0.75rem 0 0.75rem 0.25rem;
-}
+h1.ok { color: var(--ok); }
+.balek { width: 9.5rem; max-width: 100%; height: auto; align-self: center; }
+.balek .skin { fill: var(--bg); stroke: var(--ink); stroke-width: 3; }
+.balek .eye { fill: var(--ink); }
+.balek .shine { fill: var(--sheet); }
+.balek .ln { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.balek .tear { fill: var(--alert); }
 .toast { font: 500 clamp(1.15rem, 4.6vw, 1.35rem)/1.35 var(--display); }
 @media (prefers-reduced-motion: no-preference) {
   .step:not([hidden]) { animation: in 0.25s ease-out; }
-  .stamp { animation: thump 0.35s cubic-bezier(.2,1.6,.4,1); }
 }
 @keyframes in { from { transform: translateY(6px); opacity: 0.4; } to { transform: none; opacity: 1; } }
-@keyframes thump { from { transform: rotate(-6deg) scale(2.2); opacity: 0; } to { transform: rotate(-6deg) scale(1); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .arena button { transition: none; } }
 </style>
 </head>
@@ -203,7 +197,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   <section class="step" id="s-ask" hidden>
     <p class="eyebrow">1 találat · üzenet a balektól</p>
     <blockquote>
-      <strong data-f="full"></strong>, alias <strong data-f="alias"></strong>, avagy <span data-f="mottoq"></span>:
+      <strong data-f="full"></strong>, alias <strong data-f="alias"></strong>, avagy <strong data-f="motto"></strong>:
       leszel-e a <strong data-f="role"></strong>?
     </blockquote>
     <p class="hint" id="ask-hint" aria-live="polite"></p>
@@ -216,7 +210,17 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   <section class="step" id="s-sure" hidden>
     <p class="eyebrow">Megerősítés · 1 / 2</p>
     <h2 tabindex="-1">Biztos nem?</h2>
-    <p class="lead">A rendszer szerint ez elhamarkodott válasz volt. A balek közben nagyon szépen néz.</p>
+    <p class="lead">A rendszer szerint ez elhamarkodott válasz volt. A balek közben nagyon szépen néz:</p>
+    <svg class="balek" viewBox="0 0 200 160" role="img" aria-label="Nagy szemű, könyörgő balek">
+      <circle class="skin" cx="42" cy="48" r="20"/><circle class="skin" cx="158" cy="48" r="20"/>
+      <ellipse class="skin" cx="100" cy="92" rx="76" ry="62"/>
+      <path class="ln" d="M48 52 Q62 40 80 46"/><path class="ln" d="M152 52 Q138 40 120 46"/>
+      <circle class="eye" cx="66" cy="88" r="27"/><circle class="eye" cx="134" cy="88" r="27"/>
+      <circle class="shine" cx="56" cy="77" r="10"/><circle class="shine" cx="124" cy="77" r="10"/>
+      <circle class="shine" cx="76" cy="99" r="5"/><circle class="shine" cx="144" cy="99" r="5"/>
+      <path class="ln" d="M90 130 Q100 123 110 130"/>
+      <path class="tear" d="M163 112 q7 11 0 16 q-7 -5 0 -16z"/>
+    </svg>
     <div class="actions">
       <button class="solid" id="sure-yes" type="button">Na jó, igen</button>
       <button id="sure-no" type="button">Biztos nem</button>
@@ -235,24 +239,25 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   </section>
 
   <section class="step" id="s-done" hidden>
-    <p class="eyebrow">Válasz rögzítve</p>
-    <div class="stamp" id="stamp"></div>
+    <p class="eyebrow">Hibaelhárítás · eredmény</p>
+    <h1 id="done-code"></h1>
     <h2 tabindex="-1" id="done-title"></h2>
     <p class="lead" id="done-text"></p>
-    <p class="toast">Balázs keresztelője előtt, amikor találkozunk, erre is iszunk egyet.</p>
+    <div class="log">POST /firmak/<span data-f="slug"></span>/balek<br><span id="done-log"></span></div>
+    <p class="toast">Balekkeresztelő előtt, amikor találkozunk, erre is iszunk egyet.</p>
     <p class="hint" id="done-hint"></p>
   </section>
 </main>
 
 <script>
 (function () {
-  var CFG = {"slug":"pici-szoszi","first":"Lili","full":"Balog Lili Dorka","alias":"Pici Szöszi","motto":"Ha kérdeztek, kuncogok, ha kerestek, csücsülök","role":"keresztapám","topic":"felkeres-73abf18eb61fdce9d2"};
+  var CFG = {"slug":"pici-szoszi","first":"Lili","full":"Balog Lili Dorka","alias":"Pici Szöszi","motto":"Ha kérdeztek, kuncogok, ha kerestek, csúcsulok","role":"keresztapám","topic":"felkeres-73abf18eb61fdce9d2"};
   var $ = function (id) { return document.getElementById(id); };
   var reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var fields = {
     slug: CFG.slug, full: CFG.full, alias: CFG.alias, motto: CFG.motto,
-    mottoq: "„" + CFG.motto + "”", role: CFG.role
+    role: CFG.role
   };
   document.querySelectorAll("[data-f]").forEach(function (el) {
     el.textContent = fields[el.getAttribute("data-f")];
@@ -276,8 +281,15 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 
   $("start").onclick = function () { show("s-id"); };
 
+  var idNo = 0;
   $("id-no").onclick = function () {
-    $("id-hint").textContent = "Akkor ez nem neked szól. Add oda a telefont az illetékes firmának.";
+    idNo++;
+    if (idNo === 1) {
+      $("id-hint").textContent = "Hmm, tuti? Pedig nagyon úgy nézel ki. Nézd meg még egyszer.";
+      $("id-no").textContent = "Tuti nem én vagyok";
+    } else {
+      $("id-hint").textContent = "Akkor ez nem neked szól. Add oda a telefont az illetékes firmának.";
+    }
   };
   $("id-yes").onclick = function () {
     notify(CFG.first + " megnyitotta és azonosította magát.");
@@ -287,9 +299,8 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 
   function runScan() {
     var lines = [
-      ["Firma azonosítva: " + CFG.alias, "good"],
-      ["Balek-adatbázis átfésülése…", ""],
-      ["Kocsmák, előadók, folyosók ellenőrzése…", ""],
+      ["Firma azonosítva: " + CFG.full, "good"],
+      ["Balekok átfésülése…", ""],
       ["1 gazdátlan balek találva.", "good"]
     ];
     var log = $("scan-log");
@@ -310,7 +321,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 
   // The "Nem" button dodges the first few attempts.
   var DODGES = 4, dodges = 0, lastDodge = 0;
-  var quips = ["Hopp. Elcsúszott.", "Majdnem megvolt.", "Ez a gomb ma nagyon fürge.", "Na jó, most már hagyja magát."];
+  var quips = ["Hopp. Elcsúszott.", "Majdnem megvolt.", "Ez a gomb ma nagyon fürge.", "Na jó, ha nagyon a nemre szeretnél nyomni, akkor nyomjál…"];
   function dodge() {
     var arena = $("arena"), no = $("ask-no");
     var maxX = Math.max(0, arena.clientWidth - no.offsetWidth);
@@ -336,12 +347,14 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 
   $("sure-no").onclick = function () {
     show("s-tuti");
-    var left = reduced ? 0 : 5;
+    var left = reduced ? 0 : 7;
+    var slow = { 3: 1500, 2: 2000, 1: 2500 };
     (function tick() {
       if (left > 0) {
         $("tuti-hint").textContent = "Gondolkodási idő: még " + left + " mp";
+        var wait = slow[left] || 1000;
         left--;
-        setTimeout(tick, 1000);
+        setTimeout(tick, wait);
       } else {
         $("tuti-hint").textContent = "Lejárt az idő. Ha nagyon muszáj, most már nyomhatod.";
         $("tuti-no").disabled = false;
@@ -354,13 +367,18 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
     if (answered) return;
     answered = true;
     var yes = answer === "IGEN";
-    $("stamp").textContent = answer;
-    $("done-title").textContent = "Hiba elhárítva: balek megtalálva";
+    $("done-code").textContent = yes ? "200" : "404";
+    $("done-code").classList.toggle("ok", yes);
+    $("done-title").textContent = yes ? "Hiba elhárítva: balek megtalálva" : "Hibaelhárítás sikertelen";
     $("done-text").textContent = yes
-      ? "Szabálytalanul gyors beleegyezés, de a rendszer elfogadta."
-      : "A rendszer a „nem”-et a hagyományoknak megfelelően értelmezte.";
-    $("status").textContent = "200 · rendben";
-    $("status").classList.add("ok");
+      ? "A balek mostantól nem gazdátlan."
+      : "A balek továbbra is gazdátlan. De nem adja fel.";
+    $("done-log").textContent = "válasz: " + answer;
+    $("done-log").className = yes ? "good" : "bad";
+    if (yes) {
+      $("status").textContent = "200 · rendben";
+      $("status").classList.add("ok");
+    }
     show("s-done");
     notify(CFG.first + " válasza: " + answer + " (" + where + ", " + dodges + " gombszökés)").then(function (ok) {
       $("done-hint").textContent = ok
