@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<style>[hidden]{display:none!important}</style>
+<title>Bence balekja 404</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow "system terminal" sheet, a status bar on top, one step visible at a time. */
+:root {
+  --bg: #e9ecf1;
+  --sheet: #fbfcfd;
+  --ink: #14213d;
+  --muted: #5b667d;
+  --line: #c9d0dc;
+  --alert: #c8102e;
+  --ok: #1b7a4b;
+  --on-solid: #ffffff;
+  --display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d121c; --sheet: #161d2b; --ink: #e7ebf3; --muted: #97a3ba; --line: #2c3649;
+    --alert: #ff6b7d; --ok: #5fd39a; --on-solid: #0d121c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d121c; --sheet: #161d2b; --ink: #e7ebf3; --muted: #97a3ba; --line: #2c3649;
+  --alert: #ff6b7d; --ok: #5fd39a; --on-solid: #0d121c; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 1rem/1.55 var(--body);
+  padding-block: 1.25rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.shell {
+  width: 100%;
+  max-width: 34rem;
+  background: var(--sheet);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--line);
+  font: 500 0.72rem/1.3 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.status { color: var(--alert); white-space: nowrap; }
+.status.ok { color: var(--ok); }
+.step {
+  padding: 1.75rem 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 24rem;
+}
+.eyebrow {
+  font: 500 0.72rem/1.3 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+h1, h2, p, dl, dd, blockquote { margin: 0; }
+h1 {
+  font: 800 clamp(5rem, 28vw, 9rem)/0.85 var(--display);
+  letter-spacing: -0.04em;
+  color: var(--alert);
+}
+h2 {
+  font: 800 clamp(1.6rem, 6.5vw, 2.1rem)/1.1 var(--display);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+h2:focus { outline: none; }
+.lead { color: var(--muted); }
+.log {
+  font: 400 0.82rem/1.7 var(--mono);
+  background: var(--bg);
+  border-radius: 3px;
+  padding: 0.75rem 0.9rem;
+  overflow-wrap: anywhere;
+  min-height: 3.2rem;
+}
+.log .bad { color: var(--alert); }
+.log .good { color: var(--ok); }
+.id {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.45rem 1rem;
+  border-block: 1px solid var(--line);
+  padding-block: 0.9rem;
+}
+.id dt { font: 500 0.72rem/1.9 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.id dd { font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
+blockquote {
+  font: 500 clamp(1.15rem, 4.6vw, 1.4rem)/1.35 var(--display);
+  border-left: 3px solid var(--alert);
+  padding-left: 1rem;
+  text-wrap: pretty;
+}
+blockquote strong { font-weight: 800; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: auto; }
+.arena { position: relative; height: 11rem; margin-top: auto; }
+.arena button { position: absolute; left: 0; bottom: 0; transition: left 0.18s ease-out, bottom 0.18s ease-out; }
+.arena #ask-no { left: 7.5rem; }
+button {
+  font: 600 1rem/1 var(--body);
+  padding: 0.85rem 1.25rem;
+  border-radius: 3px;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  min-height: 3rem;
+}
+button.solid { background: var(--ink); color: var(--on-solid); }
+button:hover:not(:disabled) { border-color: var(--alert); }
+button.solid:hover:not(:disabled) { background: var(--alert); }
+button:focus-visible { outline: 3px solid var(--alert); outline-offset: 2px; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.hint { font: 400 0.82rem/1.5 var(--mono); color: var(--muted); min-height: 1.3rem; }
+.stamp {
+  align-self: flex-start;
+  font: 800 clamp(3rem, 16vw, 4.5rem)/1 var(--display);
+  letter-spacing: 0.04em;
+  color: var(--alert);
+  border: 0.3rem solid var(--alert);
+  border-radius: 6px;
+  padding: 0.35rem 1rem 0.45rem;
+  transform: rotate(-6deg);
+  margin: 0.75rem 0 0.75rem 0.25rem;
+}
+.toast { font: 500 clamp(1.15rem, 4.6vw, 1.35rem)/1.35 var(--display); }
+@media (prefers-reduced-motion: no-preference) {
+  .step:not([hidden]) { animation: in 0.25s ease-out; }
+  .stamp { animation: thump 0.35s cubic-bezier(.2,1.6,.4,1); }
+}
+@keyframes in { from { transform: translateY(6px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+@keyframes thump { from { transform: rotate(-6deg) scale(2.2); opacity: 0; } to { transform: rotate(-6deg) scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .arena button { transition: none; } }
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="bar">
+    <span>Balek-nyilvántartó rendszer</span>
+    <span class="status" id="status" aria-live="polite">404 · hiba</span>
+  </header>
+
+  <section class="step" id="s-404">
+    <h1>404</h1>
+    <h2 tabindex="-1">Balek nem található</h2>
+    <p class="lead">A keresett firmához egyetlen balek sincs rendelve.</p>
+    <div class="log">GET /firmak/<span data-f="slug"></span>/balek<br><span class="bad">404 BALEK_NOT_FOUND</span></div>
+    <div class="actions"><button class="solid" id="start" type="button">Hibaelhárítás indítása</button></div>
+  </section>
+
+  <section class="step" id="s-id" hidden>
+    <p class="eyebrow">Hibaelhárítás · azonosítás</p>
+    <h2 tabindex="-1">Te vagy az érintett firma?</h2>
+    <dl class="id">
+      <dt>Név</dt><dd data-f="full"></dd>
+      <dt>Alias</dt><dd data-f="alias"></dd>
+      <dt>Avagy</dt><dd data-f="motto"></dd>
+    </dl>
+    <p class="hint" id="id-hint" aria-live="polite"></p>
+    <div class="actions">
+      <button class="solid" id="id-yes" type="button">Én vagyok az</button>
+      <button id="id-no" type="button">Nem én vagyok</button>
+    </div>
+  </section>
+
+  <section class="step" id="s-scan" hidden>
+    <p class="eyebrow">Hibaelhárítás · keresés</p>
+    <h2 tabindex="-1">Balek keresése folyamatban</h2>
+    <div class="log" id="scan-log" aria-live="polite"></div>
+    <div class="actions"><button class="solid" id="scan-next" type="button" hidden>Mit akar ez a balek?</button></div>
+  </section>
+
+  <section class="step" id="s-ask" hidden>
+    <p class="eyebrow">1 találat · üzenet a balektól</p>
+    <blockquote>
+      <strong data-f="full"></strong>, alias <strong data-f="alias"></strong>, avagy <span data-f="mottoq"></span>:
+      leszel-e a <strong data-f="role"></strong>?
+    </blockquote>
+    <p class="hint" id="ask-hint" aria-live="polite"></p>
+    <div class="arena" id="arena">
+      <button class="solid" id="ask-yes" type="button">Igen</button>
+      <button id="ask-no" type="button">Nem</button>
+    </div>
+  </section>
+
+  <section class="step" id="s-sure" hidden>
+    <p class="eyebrow">Megerősítés · 1 / 2</p>
+    <h2 tabindex="-1">Biztos nem?</h2>
+    <p class="lead">A rendszer szerint ez elhamarkodott válasz volt. A balek közben nagyon szépen néz.</p>
+    <div class="actions">
+      <button class="solid" id="sure-yes" type="button">Na jó, igen</button>
+      <button id="sure-no" type="button">Biztos nem</button>
+    </div>
+  </section>
+
+  <section class="step" id="s-tuti" hidden>
+    <p class="eyebrow">Megerősítés · 2 / 2</p>
+    <h2 tabindex="-1">Tuti? Gondold át.</h2>
+    <p class="lead">Kötelező gondolkodási idő. Addig a „nem” gomb pihen.</p>
+    <p class="hint" id="tuti-hint" aria-live="polite"></p>
+    <div class="actions">
+      <button class="solid" id="tuti-yes" type="button">Átgondoltam: igen</button>
+      <button id="tuti-no" type="button" disabled>Tuti nem</button>
+    </div>
+  </section>
+
+  <section class="step" id="s-done" hidden>
+    <p class="eyebrow">Válasz rögzítve</p>
+    <div class="stamp" id="stamp"></div>
+    <h2 tabindex="-1" id="done-title"></h2>
+    <p class="lead" id="done-text"></p>
+    <p class="toast">Balázs keresztelője előtt, amikor találkozunk, erre is iszunk egyet.</p>
+    <p class="hint" id="done-hint"></p>
+  </section>
+</main>
+
+<script>
+(function () {
+  var CFG = {"slug":"c-mint-bence","first":"Bence","full":"Ádám Bence","alias":"C, mint Bence","motto":"Hidd el, normális ember szorult ebbe a testbe","role":"keresztanyám","topic":"felkeres-73abf18eb61fdce9d2"};
+  var $ = function (id) { return document.getElementById(id); };
+  var reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var fields = {
+    slug: CFG.slug, full: CFG.full, alias: CFG.alias, motto: CFG.motto,
+    mottoq: "„" + CFG.motto + "”", role: CFG.role
+  };
+  document.querySelectorAll("[data-f]").forEach(function (el) {
+    el.textContent = fields[el.getAttribute("data-f")];
+  });
+
+  function show(id) {
+    document.querySelectorAll(".step").forEach(function (s) { s.hidden = s.id !== id; });
+    var h = document.querySelector("#" + id + " h2");
+    if (h) h.focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+  }
+
+  // Sends the answer to the balek's phone (ntfy.sh topic). Resolves true when delivered.
+  function notify(text) {
+    if (!CFG.topic) return Promise.resolve(false);
+    try {
+      return fetch("https://ntfy.sh/" + CFG.topic, { method: "POST", body: text, keepalive: true })
+        .then(function (r) { return r.ok; }, function () { return false; });
+    } catch (e) { return Promise.resolve(false); }
+  }
+
+  $("start").onclick = function () { show("s-id"); };
+
+  $("id-no").onclick = function () {
+    $("id-hint").textContent = "Akkor ez nem neked szól. Add oda a telefont az illetékes firmának.";
+  };
+  $("id-yes").onclick = function () {
+    notify(CFG.first + " megnyitotta és azonosította magát.");
+    show("s-scan");
+    runScan();
+  };
+
+  function runScan() {
+    var lines = [
+      ["Firma azonosítva: " + CFG.alias, "good"],
+      ["Balek-adatbázis átfésülése…", ""],
+      ["Kocsmák, előadók, folyosók ellenőrzése…", ""],
+      ["1 gazdátlan balek találva.", "good"]
+    ];
+    var log = $("scan-log");
+    log.textContent = "";
+    var i = 0;
+    function next() {
+      if (i >= lines.length) { $("scan-next").hidden = false; $("scan-next").focus(); return; }
+      var row = document.createElement("div");
+      row.textContent = lines[i][0];
+      if (lines[i][1]) row.className = lines[i][1];
+      log.appendChild(row);
+      i++;
+      setTimeout(next, reduced ? 0 : 750);
+    }
+    next();
+  }
+  $("scan-next").onclick = function () { show("s-ask"); };
+
+  // The "Nem" button dodges the first few attempts.
+  var DODGES = 4, dodges = 0, lastDodge = 0;
+  var quips = ["Hopp. Elcsúszott.", "Majdnem megvolt.", "Ez a gomb ma nagyon fürge.", "Na jó, most már hagyja magát."];
+  function dodge() {
+    var arena = $("arena"), no = $("ask-no");
+    var maxX = Math.max(0, arena.clientWidth - no.offsetWidth);
+    var maxY = Math.max(0, arena.clientHeight - no.offsetHeight);
+    var x, y, tries = 0;
+    do {
+      x = Math.random() * maxX; y = Math.random() * maxY; tries++;
+    } while (tries < 20 && (Math.abs(x - no.offsetLeft) < 70 || (x < 110 && y < 60)));
+    no.style.left = x + "px";
+    no.style.bottom = y + "px";
+    $("ask-hint").textContent = quips[Math.min(dodges, quips.length - 1)];
+    dodges++;
+    lastDodge = Date.now();
+  }
+  $("ask-no").addEventListener("pointerenter", function (e) {
+    if (e.pointerType === "mouse" && dodges < DODGES) dodge();
+  });
+  $("ask-no").addEventListener("click", function () {
+    if (Date.now() - lastDodge < 350) return;
+    if (dodges < DODGES) { dodge(); return; }
+    show("s-sure");
+  });
+
+  $("sure-no").onclick = function () {
+    show("s-tuti");
+    var left = reduced ? 0 : 5;
+    (function tick() {
+      if (left > 0) {
+        $("tuti-hint").textContent = "Gondolkodási idő: még " + left + " mp";
+        left--;
+        setTimeout(tick, 1000);
+      } else {
+        $("tuti-hint").textContent = "Lejárt az idő. Ha nagyon muszáj, most már nyomhatod.";
+        $("tuti-no").disabled = false;
+      }
+    })();
+  };
+
+  var answered = false;
+  function finish(answer, where) {
+    if (answered) return;
+    answered = true;
+    var yes = answer === "IGEN";
+    $("stamp").textContent = answer;
+    $("done-title").textContent = "Hiba elhárítva: balek megtalálva";
+    $("done-text").textContent = yes
+      ? "Szabálytalanul gyors beleegyezés, de a rendszer elfogadta."
+      : "A rendszer a „nem”-et a hagyományoknak megfelelően értelmezte.";
+    $("status").textContent = "200 · rendben";
+    $("status").classList.add("ok");
+    show("s-done");
+    notify(CFG.first + " válasza: " + answer + " (" + where + ", " + dodges + " gombszökés)").then(function (ok) {
+      $("done-hint").textContent = ok
+        ? "A balekod értesítést kapott a válaszodról."
+        : "Küldj erről egy képernyőfotót a balekodnak, hogy biztosan megkapja.";
+    });
+  }
+  $("ask-yes").onclick = function () { finish("IGEN", "elsőre"); };
+  $("sure-yes").onclick = function () { finish("IGEN", "a „biztos nem?” után"); };
+  $("tuti-yes").onclick = function () { finish("IGEN", "gondolkodási idő után"); };
+  $("tuti-no").onclick = function () { finish("NEM", "végigvitte"); };
+})();
+</script>
+</body>
+</html>
